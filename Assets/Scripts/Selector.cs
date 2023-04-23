@@ -6,9 +6,12 @@ using UnityEngine;
 public class Selector : MonoBehaviour
 {
     private const float size = 19.5f;
+    private const float CellSize = 6.5f;
+    private const float HalfSize = CellSize / 2;
     [SerializeField] List<Transform> Cells = new List<Transform>();
     [SerializeField] List<float> CellOffsets = new List<float>();
 
+    [SerializeField] float ScrollSpeed = 50;
 
     float Speed;
     bool Down;
@@ -64,13 +67,13 @@ public class Selector : MonoBehaviour
 
         for (int i = 0; i < Cells.Count; i++)
         {
-            Cells[i].position = Dir * (i * 6.5f) + Cross * Cells[i].position[CrossIndex];
+            Cells[i].position = Dir * (i * CellSize) + Cross * Cells[i].position[CrossIndex];
         }
     }
 
     private void Apply()
     {
-        Speed += Input.mouseScrollDelta.y * Time.deltaTime * 30;
+        Speed += Input.mouseScrollDelta.y * Time.deltaTime * ScrollSpeed;
 
         if (Speed < 0)
         {
@@ -78,7 +81,7 @@ public class Selector : MonoBehaviour
         }
         for (int i = 0; i < Cells.Count; i++)
         {
-            Cells[i].position = Dir * ((Speed + CellOffsets[i]) % size) + Cross * Cells[i].position[CrossIndex];
+            Cells[i].position = Dir * (( - HalfSize) + (Speed + CellOffsets[i]) % size) + Cross * Cells[i].position[CrossIndex];
         }
 
         grid.ApplyChanges();
@@ -88,7 +91,7 @@ public class Selector : MonoBehaviour
     {
 
         (VectorIndex, CrossIndex, Dir, Cross) = grid.GetInfo(dir);
-        Speed = 0;
+        Speed = HalfSize;
 
         if(Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition),out RaycastHit hit))
         {
